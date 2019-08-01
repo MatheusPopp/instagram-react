@@ -1,25 +1,48 @@
 import React, { Component } from 'react';
 import Foto from './Foto';
+import Header, {TimelineHeader} from './Header';
+import {withRouter} from 'react-router-dom';
 
 
-export default class Timeline extends Component {
+class Timeline extends Component {
 
+    render() {
+        return (
+
+            <div className="main">
+                <TimelineHeader history={this.props.history}></TimelineHeader>
+                <TimelineContainer></TimelineContainer>
+            </div> 
+        );
+    }
+}
+
+class TimelineContainer extends Component {
     constructor(){
         super();
         this.state = {fotos: []};
     }
-
-    componentDidMount() {
-        fetch('http://localhost:8080/api/public/fotos/alots').then(response => response.json()).then(fotos => this.setState({fotos: fotos}));
+ 
+    componentDidMount(){
+        fetch(`http://localhost:8080/api/fotos?X-AUTH-TOKEN=${localStorage.getItem('@instaReact/auth-token')}`)
+            .then(response => response.json())
+            .then(fotos => {
+                this.setState({fotos:fotos});
+            });
     }
 
     render() {
         return (
             <div className="fotos container">
                 {
-                    this.state.fotos.map(foto => <Foto foto={foto}></Foto> )
+                    this.state.fotos.map(foto => {
+                        return <div key={foto.id}><Foto foto={foto}></Foto></div>
+                    })
                 }
             </div>
-        );
+        )
     }
 }
+
+export default withRouter(Timeline);
+

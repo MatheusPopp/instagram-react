@@ -43,6 +43,7 @@ html,body {
   }
   
   .header-busca-campo {
+    margin-top: 1em;
     padding: .5em;
     margin-left: 1em;
     background: #fafafa;
