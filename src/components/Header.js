@@ -23,8 +23,12 @@ class Header extends Component {
 export class TimelineHeader extends Component {
     
     pesquisa = (e) => {
+    }
+
+    logout = (e) => {
         e.preventDefault();
-        this.props.history.push('/');;
+        localStorage.removeItem('@instaReact/auth-token');
+        this.props.history.push('/');
     }
     
     render() {
@@ -32,6 +36,7 @@ export class TimelineHeader extends Component {
             <Header>
                 <form className="header-busca" onSubmit={this.pesquisa}>
                     <input type="text" name="search" placeholder="Pesquisa" className="header-busca-campo" /><input type="submit" value="Buscar" className="header-busca-submit" />
+                    <button type="button" className="button-header" onClick={this.logout}>Sair</button>
                 </form>
 
                 <nav>

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Foto from './Foto';
 import Header, {TimelineHeader} from './Header';
 import {withRouter} from 'react-router-dom';
+import Login from './Login';
 
 
 class Timeline extends Component {
@@ -32,15 +33,19 @@ class TimelineContainer extends Component {
     }
 
     render() {
-        return (
-            <div className="fotos container">
-                {
-                    this.state.fotos.map(foto => {
-                        return <div key={foto.id}><Foto foto={foto}></Foto></div>
-                    })
-                }
-            </div>
-        )
+        if(localStorage.getItem('@instaReact/auth-token')) {
+            return (
+                <div className="fotos container">
+                    {
+                        this.state.fotos.map(foto => {
+                            return <div key={foto.id}><Foto foto={foto}></Foto></div>
+                        })
+                    }
+                </div>
+            )
+        } else {
+            return(<Login></Login>)
+        }
     }
 }
 
