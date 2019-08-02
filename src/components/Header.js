@@ -21,14 +21,17 @@ class Header extends Component {
 
 
 export class TimelineHeader extends Component {
+
+    constructor() {
+        super();
+    }
     
     pesquisa = (e) => {
     }
 
     logout = (e) => {
         e.preventDefault();
-        localStorage.removeItem('@instaReact/auth-token');
-        this.props.history.push('/');
+        this.props.history.push('/logout');
     }
     
     render() {

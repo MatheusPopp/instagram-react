@@ -33,19 +33,16 @@ class TimelineContainer extends Component {
     }
 
     render() {
-        if(localStorage.getItem('@instaReact/auth-token')) {
-            return (
-                <div className="fotos container">
-                    {
-                        this.state.fotos.map(foto => {
-                            return <div key={foto.id}><Foto foto={foto}></Foto></div>
-                        })
-                    }
-                </div>
-            )
-        } else {
-            return(<Login></Login>)
-        }
+        return (
+            <div className="fotos container">
+                {
+                    this.state.fotos.map(foto => {
+                        return <div key={foto.id}><Foto foto={foto}></Foto></div>
+                    })
+                }
+            </div>
+        )
+            
     }
 }
 
