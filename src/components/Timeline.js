@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import Foto from './Foto';
-import Header, {TimelineHeader} from './Header';
+import {TimelineHeader} from './Header';
 import {withRouter} from 'react-router-dom';
-import Login from './Login';
 
 
 class Timeline extends Component {
@@ -11,25 +10,29 @@ class Timeline extends Component {
         return (
 
             <div className="main">
-                <TimelineHeader history={this.props.history}></TimelineHeader>
-                <TimelineContainer></TimelineContainer>
+                <TimelineHeader {...this.props}></TimelineHeader>
+                <TimelineContainer {...this.props}></TimelineContainer>
             </div> 
         );
     }
 }
 
 class TimelineContainer extends Component {
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this.state = {fotos: []};
     }
  
     componentDidMount(){
-        fetch(`http://localhost:8080/api/fotos?X-AUTH-TOKEN=${localStorage.getItem('@instaReact/auth-token')}`)
+        const login = this.props.match.params['login'];
+
+        let urlPerfil = !login ? `http://localhost:8080/api/fotos?X-AUTH-TOKEN=${localStorage.getItem('@instaReact/auth-token')}` : `http://localhost:8080/api/public/fotos/${login}`;
+       
+        fetch(urlPerfil)
             .then(response => response.json())
             .then(fotos => {
-                this.setState({fotos:fotos});
-            });
+            this.setState({fotos:fotos});
+            });  
     }
 
     render() {

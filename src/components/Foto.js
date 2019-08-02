@@ -1,19 +1,27 @@
 import React, { Component } from 'react';
+import { withRouter, Link } from 'react-router-dom';
+
 
 
 class Header extends Component {
+
+    constructor(props) {
+        super(props);
+    }
     render() {
         return (
             <header className="foto-header">
+
                 <figure className="foto-usuario">
-                    <img src={this.props.imgSrc} alt="foto do usuario" />
-                    <figcaption className="foto-usuario">
-                        <a href="#">
-                            {this.props.loginUsuario}
-                    </a>
-                    </figcaption>
+                    <Link to={`/timeline/${this.props.foto.loginUsuario}`}>
+                        <img src={this.props.foto.urlPerfil} alt="foto do usuario" />
+                        <figcaption className="foto-usuario">
+                            {this.props.foto.loginUsuario}
+                        </figcaption>
+                    </Link>
                 </figure>
-                <time className="foto-data">{this.props.horario}</time>
+
+                <time className="foto-data">{this.props.foto.horario}</time>
             </header>
         );
 
@@ -32,14 +40,19 @@ class Info extends Component {
                         })
                     }
                     {
-                        this.props.foto.likers && this.props.foto.likers.length > 0 ? 'curtiram': ''    
+                        this.props.foto.likers && this.props.foto.likers.length > 0 ? 'curtiram' : ''
                     }
                 </div>
 
                 {
-                    this.props.foto.comentario ?  
-                        <p className="foto-info-legenda"><a className="foto-info-autor">{this.props.foto.loginUsuario} </a>{this.props.foto.comentario}</p> 
-                        : 
+                    this.props.foto.comentario ?
+                        <p className="foto-info-legenda">
+                            <Link to={`/timeline/${this.props.foto.loginUsuario}`}>
+                                {this.props.foto.loginUsuario}
+                            </Link>
+                             <span> {this.props.foto.comentario}</span>
+                        </p>
+                        :
                         ''
                 }
                 <ul className="foto-info-comentarios">
@@ -47,9 +60,9 @@ class Info extends Component {
                         this.props.foto.comentarios && this.props.foto.comentarios.length > 0 ?
                             this.props.foto.comentarios.map(comentario => {
                                 return <li className="comentario" key={comentario.id}>
-                                            <a className="foto-info-autor">{comentario.login} </a>
-                                            {comentario.texto}
-                                        </li>
+                                    <Link to={`/timeline/${comentario.login}`}><a className="foto-info-autor">{comentario.login} </a></Link>
+                                    {comentario.texto}
+                                </li>
                             })
                             :
                             ''
@@ -63,28 +76,30 @@ class Info extends Component {
 class Footer extends Component {
 
     render() {
-        return(
+        return (
             <section className="fotoAtualizacoes">
-                    <a href="#" className="fotoAtualizacoes-like">Likar</a>
-                    <form className="fotoAtualizacoes-form">
-                        <input type="text" placeholder="Adicione um comentário..." className="fotoAtualizacoes-form-campo" />
-                        <input type="submit" value="Comentar!" className="fotoAtualizacoes-form-submit" />
-                    </form>
+                <a href="#" className="fotoAtualizacoes-like">Likar</a>
+                <form className="fotoAtualizacoes-form">
+                    <input type="text" placeholder="Adicione um comentário..." className="fotoAtualizacoes-form-campo" />
+                    <input type="submit" value="Comentar!" className="fotoAtualizacoes-form-submit" />
+                </form>
             </section>
         );
     }
 }
 
-export default class Foto extends Component {
+class Foto extends Component {
 
     render() {
         return (
             <div className="foto">
-                <Header imgSrc={this.props.foto.urlPerfil} loginUsuario={this.props.foto.loginUsuario} horario={this.props.foto.horario}></Header>
+                <Header {...this.props}></Header>
                 <img alt="foto" className="foto-src" src={this.props.foto.urlFoto} />
                 <Info foto={this.props.foto}></Info>
-                <Footer></Footer>        
+                <Footer></Footer>
             </div>
         );
     }
 }
+
+export default withRouter(Foto);

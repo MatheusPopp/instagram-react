@@ -1,7 +1,5 @@
 export default class AuthenticationService {
 
-    constructor() {}
-    
     isAuthenticated = () => {
         return localStorage.getItem('@instaReact/auth-token') ? true : false;
     }

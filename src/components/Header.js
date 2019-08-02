@@ -1,15 +1,19 @@
 import React, { Component } from 'react';
-import history from './History'
-import {withRouter} from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 
 class Header extends Component {
 
     render() {
         return (
             <header className="header container">
-                <h1 className="header-logo">
-                    InstaReact
-            </h1>
+
+                <Link to={'/timeline'}>
+                    <h1 className="header-logo">
+
+                        InstaReact
+                    </h1>
+                </Link>
+
                 <div>
                     {this.props.children}
                 </div>
@@ -22,10 +26,6 @@ class Header extends Component {
 
 export class TimelineHeader extends Component {
 
-    constructor() {
-        super();
-    }
-    
     pesquisa = (e) => {
     }
 
@@ -33,7 +33,7 @@ export class TimelineHeader extends Component {
         e.preventDefault();
         this.props.history.push('/logout');
     }
-    
+
     render() {
         return (
             <Header>
