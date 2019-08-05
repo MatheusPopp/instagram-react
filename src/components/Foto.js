@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
+import AuthenticationService from '../services/AuthenticationService';
+import PubSub from 'pubsub.js'
 
 
 
 class Header extends Component {
 
-    constructor(props) {
-        super(props);
-    }
     render() {
         return (
             <header className="foto-header">
@@ -36,11 +35,11 @@ class Info extends Component {
                 <div className="foto-info-likes">
                     {
                         this.props.foto.likers.map(liker => {
-                            return <a href="#" key={liker.login}>{liker.login} </a>
+                            return <Link to={`/timeline/${liker.login}`} key={liker.login}> {liker.login} </Link>
                         })
                     }
                     {
-                        this.props.foto.likers && this.props.foto.likers.length > 0 ? 'curtiram' : ''
+                        this.props.foto.likers && this.props.foto.likers.length > 1 ? 'curtiram' : this.props.foto.likers.length === 1 ? 'curtiu' : undefined
                     }
                 </div>
 
@@ -60,8 +59,8 @@ class Info extends Component {
                         this.props.foto.comentarios && this.props.foto.comentarios.length > 0 ?
                             this.props.foto.comentarios.map(comentario => {
                                 return <li className="comentario" key={comentario.id}>
-                                    <Link to={`/timeline/${comentario.login}`}><a className="foto-info-autor">{comentario.login} </a></Link>
-                                    {comentario.texto}
+                                    <Link to={`/timeline/${comentario.login}`} className="foto-info-autor">{comentario.login} </Link>
+                                     {comentario.texto}
                                 </li>
                             })
                             :
@@ -75,28 +74,92 @@ class Info extends Component {
 
 class Footer extends Component {
 
+    constructor(props) {
+        super(props);
+        this.authenticationService = new AuthenticationService();
+        this.state = {likeada : this._verificaLikeUsuario(this.props.foto.likers), comentario: ''};
+
+    }
+
+    like = (e) => {
+        e.preventDefault();
+        const requestInfo = {
+            method: 'POST',
+            headers: new Headers({
+                'Content-type':'application/json'
+            })
+        };
+
+        fetch(`http://localhost:8080/api/fotos/${this.props.foto.id}/like?X-AUTH-TOKEN=${this.authenticationService.token}`, requestInfo).then(result => {
+            if(result.ok){
+                return result.json();
+            } else{
+                throw new Error("não foi possível realizar o like da foto");
+            }
+        }).then(liker => {
+            PubSub.publish('atualiza-dados'); 
+            this.setState({likeada: !this.state.likeada});       
+        });
+
+    }
+
+    comenta = (e) => {
+        e.preventDefault();
+        const requestInfo = {
+            method: 'POST',
+            body: JSON.stringify({texto: this.state.comentario}),
+            headers: new Headers({
+                'Content-type':'application/json'
+            })
+        };
+
+        fetch(`http://localhost:8080/api/fotos/${this.props.foto.id}/comment?X-AUTH-TOKEN=${this.authenticationService.token}`, requestInfo).then(result => {
+            if(result.ok){
+                return result.json();
+            } else{
+                console.log(result);
+            }
+        }).then(comentario => {
+            PubSub.publish('atualiza-dados'); 
+        });
+    }
+
+    handleChange = (e) => {
+        let change = {}
+        change[e.target.name] = e.target.value;
+        this.setState(change);
+    }
+
+    _verificaLikeUsuario = (likers) => {
+        if(likers && typeof(likers) === 'object') {
+            return likers.some(x => x.login === this.authenticationService.userName);   
+        }
+        return false;
+    }
+
     render() {
-        return (
+        const component = this.props.authenticationService.isAuthenticated() ?
             <section className="fotoAtualizacoes">
-                <a href="#" className="fotoAtualizacoes-like">Likar</a>
-                <form className="fotoAtualizacoes-form">
-                    <input type="text" placeholder="Adicione um comentário..." className="fotoAtualizacoes-form-campo" />
+                <div onClick={this.like} className={this.state.likeada ? "fotoAtualizacoes-like-ativo" : "fotoAtualizacoes-like"}>Likar</div>
+                <form className="fotoAtualizacoes-form" onSubmit={this.comenta}>
+                    <input name="comentario" type="text" placeholder="Adicione um comentário..." onChange={this.handleChange} className="fotoAtualizacoes-form-campo" />
                     <input type="submit" value="Comentar!" className="fotoAtualizacoes-form-submit" />
                 </form>
-            </section>
-        );
+            </section> : null;
+        return (component);
     }
 }
 
 class Foto extends Component {
 
+
     render() {
         return (
             <div className="foto">
-                <Header {...this.props}></Header>
+                <Header {...this.props} authenticationService={this.props.authenticationService}></Header>
                 <img alt="foto" className="foto-src" src={this.props.foto.urlFoto} />
-                <Info foto={this.props.foto}></Info>
-                <Footer></Footer>
+                <Info foto={this.props.foto} authenticationService={this.props.authenticationService}></Info>
+                <Footer {...this.props} authenticationService={this.props.authenticationService}></Footer>
             </div>
         );
     }

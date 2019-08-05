@@ -7,7 +7,7 @@ import Timeline from '../components/Timeline';
 import AuthenticationService from '../services/AuthenticationService';
 
 
-
+const authenticationService = new AuthenticationService();
 class RouteConfig extends Component {
 
     render() {
@@ -29,7 +29,7 @@ class RouteConfig extends Component {
 
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} render = {(props) => (
-        (AuthenticationService.isAuthenticated === true ?
+        (authenticationService.isAuthenticated() === true ?
             <Component {...props}></Component> 
             :
             <Redirect to='/'></Redirect>)
