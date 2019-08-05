@@ -16,6 +16,30 @@ export default class AuthenticationService {
         localStorage.setItem('@instaReact/auth-token', token);
     }
 
+    logon = (login, senha) => {
+        const requestInfo = {
+            method: 'POST',
+            body: JSON.stringify({login: login, senha: senha}),
+            headers: new Headers({
+                'Content-type':'application/json'
+            })
+        };
+       
+        return (fetch('http://localhost:8080/api/public/login', requestInfo).then(result => {
+            //200
+            if(result.ok){
+                return result.text();
+            } else{
+                throw new Error('Não foi possível realizar o login');
+            }
+        }).then(token => {
+            localStorage.setItem('@instaReact/auth-token', token);
+            return token;
+        }).catch(error => {
+            return error;
+        }));
+    }
+
     logout = () => {
         localStorage.removeItem('@instaReact/auth-token');
     }

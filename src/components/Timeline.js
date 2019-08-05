@@ -1,78 +1,84 @@
 import React, { Component } from 'react';
 import Foto from './Foto';
-import {TimelineHeader} from './Header';
-import {withRouter} from 'react-router-dom';
-import Pubsub from 'pubsub.js'
+import { TimelineHeader } from './Header';
+import { withRouter } from 'react-router-dom';
+import Pubsub from 'pubsub-js'
 import AuthenticationService from '../services/AuthenticationService';
-
+import { CSSTransitionGroup } from 'react-transition-group';
+import FotoService from '../services/FotoService';
+import TimelineService from '../services/TimelineService';
 
 
 class Timeline extends Component {
 
-    constructor () {
+    constructor() {
         super();
         this.authenticationService = new AuthenticationService();
+        this.fotoService = new FotoService();
+        this.timelineService = new TimelineService();
     }
 
     render() {
         return (
 
             <div className="main">
-                <TimelineHeader {...this.props} authenticationService={this.authenticationService}></TimelineHeader>
-                <TimelineContainer {...this.props} authenticationService={this.authenticationService}></TimelineContainer>
-            </div> 
+                <TimelineHeader {...this.props} authenticationService={this.authenticationService} fotoService={this.fotoService} timelineService={this.timelineService}></TimelineHeader>
+                <TimelineContainer {...this.props} authenticationService={this.authenticationService}  fotoService={this.fotoService} timelineService={this.timelineService}></TimelineContainer>
+            </div>
         );
     }
 }
 
 class TimelineContainer extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
-        this.state = {fotos: []};
+        this.state = { fotos: [] };
 
-        Pubsub.subscribe('atualiza-dados',(topico, info) => {
+        Pubsub.subscribe('atualiza-dados', (topico, info) => {
             this.obtemDados();
         });
 
-        Pubsub.subscribe('timeline', function(topico, fotos){
-            console.log(fotos);
+        Pubsub.subscribe('updateTimeline', (topico, fotos) => {
+            this.setState({fotos});
         });
-        
+
     }
- 
-    componentDidMount(){
-         this.obtemDados();      
+
+    componentDidMount() {
+        this.props.timelineService.obtemDados(this.props.match.params['login']).then(fotos => {
+            if(fotos){
+                this.setState({ fotos: fotos });            
+            }
+        });
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if(prevProps.match.params.login !== this.props.match.params.login){
-            this.obtemDados(); 
+        if (prevProps.match.params.login !== this.props.match.params.login) {
+            this.props.timelineService.obtemDados(this.props.match.params['login']).then(fotos => {
+                if(fotos){
+                    this.setState({ fotos: fotos });            
+                }
+            });
         }
-    }
-
-    obtemDados = () => {
-        const login = this.props.match.params['login'];
-
-        let urlPerfil = !login ? `http://localhost:8080/api/fotos?X-AUTH-TOKEN=${localStorage.getItem('@instaReact/auth-token')}` : `http://localhost:8080/api/public/fotos/${login}`;
-       
-        fetch(urlPerfil)
-            .then(response => response.json())
-            .then(fotos => {
-            this.setState({fotos:fotos});
-            }); 
     }
 
     render() {
         return (
             <div className="fotos container">
-                {
-                    this.state.fotos.map(foto => {
-                        return <div key={foto.id}><Foto foto={foto} authenticationService={this.props.authenticationService}></Foto></div>
-                    })
-                }
+                <CSSTransitionGroup
+                    transitionName="timeline"
+                    transitionEnterTimeout={500}
+                    transitionLeaveTimeout={300}>
+                    {
+                        this.state.fotos.map(foto => {
+                            return <div key={foto.id}><Foto foto={foto} {...this.props}></Foto></div>
+                        })
+                    }
+                </CSSTransitionGroup>
+
             </div>
         )
-            
+
     }
 }
 

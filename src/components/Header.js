@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
-import Pubsub from 'pubsub.js'
+import PubSub from 'pubsub-js';
 
 
 class Header extends Component {
@@ -35,25 +35,16 @@ export class TimelineHeader extends Component {
 
     pesquisa = (e) => {
         e.preventDefault();
-        fetch(`http://localhost:8080/api/public/fotos/${this.filter.value}`).then(result => {
-            if(result.ok){
-                return result.json();
-            } else{
-                throw new Error('Usuário não encontrado');
+        this.props.timelineService.pesquisa(this.filter.value).then(result => {
+            if(result) {
+                PubSub.publish('updateTimeline', result);
             }
-        }).then(result => {
-            if(result && result.length > 0){
-                this.props.history.push(`/timeline/${this.filter.value}`);
-            } else{
-                alert('Usuário não encontrado');
-            }
-        }).catch(error => {
-            console.log(error);
         });
     }
 
     logout = (e) => {
         e.preventDefault();
+        this.props.authenticationService.logout();
         this.props.history.push('/logout');
     }
 

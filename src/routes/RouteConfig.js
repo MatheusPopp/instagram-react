@@ -10,12 +10,17 @@ import AuthenticationService from '../services/AuthenticationService';
 const authenticationService = new AuthenticationService();
 class RouteConfig extends Component {
 
+    constructor () {
+        super();
+        this.authenticationService = new AuthenticationService();
+    }
+
     render() {
         return (
             <Router>
                 <App>
                     <Switch>
-                        <Route exact path="/" component={Login}></Route>
+                        <Route exact path="/" component={ (props) => <Login {...props} authenticationService = {this.authenticationService}></Login>}></Route>
                         <PrivateRoute exact path="/timeline" component={Timeline}></PrivateRoute>
                         <Route path="/timeline/:login" component={Timeline}></Route>
                         <Route path="/logout" component={Logout}></Route>

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
-import AuthenticationService from '../services/AuthenticationService';
-import PubSub from 'pubsub.js'
+import PubSub from 'pubsub-js'
 
 
 
@@ -76,65 +75,23 @@ class Footer extends Component {
 
     constructor(props) {
         super(props);
-        this.authenticationService = new AuthenticationService();
-        this.state = {likeada : this._verificaLikeUsuario(this.props.foto.likers), comentario: ''};
-
+        this.comentario = '';
+        this.state = {likeada : this.props.fotoService.verificaLikeUsuario(this.props.foto.likers)};
     }
 
     like = (e) => {
         e.preventDefault();
-        const requestInfo = {
-            method: 'POST',
-            headers: new Headers({
-                'Content-type':'application/json'
-            })
-        };
-
-        fetch(`http://localhost:8080/api/fotos/${this.props.foto.id}/like?X-AUTH-TOKEN=${this.authenticationService.token}`, requestInfo).then(result => {
-            if(result.ok){
-                return result.json();
-            } else{
-                throw new Error("não foi possível realizar o like da foto");
-            }
-        }).then(liker => {
-            PubSub.publish('atualiza-dados'); 
-            this.setState({likeada: !this.state.likeada});       
+        this.props.fotoService.like(this.props.foto.id).then(result => {
+            PubSub.publish('atualiza-dados');
         });
-
+        this.setState({ likeada: !this.state.likeada });
     }
 
     comenta = (e) => {
         e.preventDefault();
-        const requestInfo = {
-            method: 'POST',
-            body: JSON.stringify({texto: this.state.comentario}),
-            headers: new Headers({
-                'Content-type':'application/json'
-            })
-        };
-
-        fetch(`http://localhost:8080/api/fotos/${this.props.foto.id}/comment?X-AUTH-TOKEN=${this.authenticationService.token}`, requestInfo).then(result => {
-            if(result.ok){
-                return result.json();
-            } else{
-                console.log(result);
-            }
-        }).then(comentario => {
-            PubSub.publish('atualiza-dados'); 
+        this.props.fotoService.comenta(this.props.foto.id, this.comentario.value).then(result => {
+            PubSub.publish('atualiza-dados');
         });
-    }
-
-    handleChange = (e) => {
-        let change = {}
-        change[e.target.name] = e.target.value;
-        this.setState(change);
-    }
-
-    _verificaLikeUsuario = (likers) => {
-        if(likers && typeof(likers) === 'object') {
-            return likers.some(x => x.login === this.authenticationService.userName);   
-        }
-        return false;
     }
 
     render() {
@@ -142,7 +99,7 @@ class Footer extends Component {
             <section className="fotoAtualizacoes">
                 <div onClick={this.like} className={this.state.likeada ? "fotoAtualizacoes-like-ativo" : "fotoAtualizacoes-like"}>Likar</div>
                 <form className="fotoAtualizacoes-form" onSubmit={this.comenta}>
-                    <input name="comentario" type="text" placeholder="Adicione um comentário..." onChange={this.handleChange} className="fotoAtualizacoes-form-campo" />
+                    <input name="comentario" type="text" placeholder="Adicione um comentário..." ref={input => this.comentario = input } className="fotoAtualizacoes-form-campo" />
                     <input type="submit" value="Comentar!" className="fotoAtualizacoes-form-submit" />
                 </form>
             </section> : null;
@@ -156,10 +113,10 @@ class Foto extends Component {
     render() {
         return (
             <div className="foto">
-                <Header {...this.props} authenticationService={this.props.authenticationService}></Header>
+                <Header {...this.props} ></Header>
                 <img alt="foto" className="foto-src" src={this.props.foto.urlFoto} />
-                <Info foto={this.props.foto} authenticationService={this.props.authenticationService}></Info>
-                <Footer {...this.props} authenticationService={this.props.authenticationService}></Footer>
+                <Info {...this.props}></Info>
+                <Footer {...this.props} ></Footer>
             </div>
         );
     }
