@@ -1,4 +1,5 @@
 import AuthenticationService from "./AuthenticationService";
+import PubSub from 'pubsub-js';
 
 export default class FotoService {
 
@@ -21,6 +22,9 @@ export default class FotoService {
             else {
                 throw new Error("não foi possível realizar o like da foto");
             }
+        }).then(like => {
+            PubSub.publish('atualizaLike', {likeInfo: like, idFoto: idFoto});
+            return like;
         }));
     }
 
@@ -39,6 +43,9 @@ export default class FotoService {
             } else{
                 console.log(result);
             }
+        }).then(comentarioInfo => {
+            PubSub.publish('atualizaComentario', {comentarioInfo: comentarioInfo, idFoto: idFoto});
+            return comentarioInfo;
         }));
     }
 

@@ -34,8 +34,12 @@ class TimelineContainer extends Component {
         super(props);
         this.state = { fotos: [] };
 
-        Pubsub.subscribe('atualiza-dados', (topico, info) => {
-            this.obtemDados();
+        Pubsub.subscribe('atualizaLike', (topico, like) => {
+            this._atualizaLike(like);
+        });
+
+        Pubsub.subscribe('atualizaComentario', (topico, comentario) => {
+            this._atualizaComentario(comentario);
         });
 
         Pubsub.subscribe('updateTimeline', (topico, fotos) => {
@@ -43,6 +47,30 @@ class TimelineContainer extends Component {
         });
 
     }
+
+    _atualizaComentario = (comentario) => {
+        let fotos = this.state.fotos;
+        let comentarios = fotos.find(x => x.id === comentario.idFoto).comentarios;
+        comentarios.push(comentario.comentarioInfo);
+
+        this.setState({fotos: fotos});
+    }
+
+    _atualizaLike = (like) => {
+        let fotos = this.state.fotos;
+        let foto = this.state.fotos.find(x => x.id === like.idFoto)
+        let likers = foto.likers;
+        const isLiked = likers.find(x => x.login === like.likeInfo.login);
+
+        if(!isLiked) {
+            likers.push(like.likeInfo);
+        } else {
+            likers = likers.filter(x => x.login !== like.likeInfo.login);;
+        }
+        foto.likers = likers;
+        this.setState({fotos: fotos});
+    }
+
 
     componentDidMount() {
         this.props.timelineService.obtemDados(this.props.match.params['login']).then(fotos => {

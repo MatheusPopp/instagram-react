@@ -75,23 +75,19 @@ class Footer extends Component {
 
     constructor(props) {
         super(props);
-        this.comentario = '';
-        this.state = {likeada : this.props.fotoService.verificaLikeUsuario(this.props.foto.likers)};
+        this.state = {likeada : this.props.fotoService.verificaLikeUsuario(this.props.foto.likers), comentario: ''};
     }
 
     like = (e) => {
         e.preventDefault();
-        this.props.fotoService.like(this.props.foto.id).then(result => {
-            PubSub.publish('atualiza-dados');
-        });
+        this.props.fotoService.like(this.props.foto.id);
         this.setState({ likeada: !this.state.likeada });
     }
 
     comenta = (e) => {
         e.preventDefault();
-        this.props.fotoService.comenta(this.props.foto.id, this.comentario.value).then(result => {
-            PubSub.publish('atualiza-dados');
-        });
+        this.props.fotoService.comenta(this.props.foto.id, this.state.comentario.value);
+        this.state.comentario.value = '';
     }
 
     render() {
@@ -99,7 +95,7 @@ class Footer extends Component {
             <section className="fotoAtualizacoes">
                 <div onClick={this.like} className={this.state.likeada ? "fotoAtualizacoes-like-ativo" : "fotoAtualizacoes-like"}>Likar</div>
                 <form className="fotoAtualizacoes-form" onSubmit={this.comenta}>
-                    <input name="comentario" type="text" placeholder="Adicione um comentário..." ref={input => this.comentario = input } className="fotoAtualizacoes-form-campo" />
+                    <input name="comentario" type="text" placeholder="Adicione um comentário..." ref={input => this.state.comentario = input } className="fotoAtualizacoes-form-campo" />
                     <input type="submit" value="Comentar!" className="fotoAtualizacoes-form-submit" />
                 </form>
             </section> : null;
