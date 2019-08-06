@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
-import PubSub from 'pubsub-js';
-
 
 class Header extends Component {
 
@@ -35,11 +33,7 @@ export class TimelineHeader extends Component {
 
     pesquisa = (e) => {
         e.preventDefault();
-        this.props.timelineService.pesquisa(this.filter.value).then(result => {
-            if(result) {
-                PubSub.publish('updateTimeline', result);
-            }
-        });
+        this.props.store.pesquisa(this.filter.value);
     }
 
     logout = (e) => {

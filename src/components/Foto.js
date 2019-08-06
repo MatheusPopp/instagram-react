@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
-import PubSub from 'pubsub-js'
-
-
 
 class Header extends Component {
 
@@ -75,19 +72,24 @@ class Footer extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {likeada : this.props.fotoService.verificaLikeUsuario(this.props.foto.likers), comentario: ''};
+        this.state = {likeada : this.verificaLikeUsuario(this.props.foto.likers)};
+        this.comentario = ''
     }
 
     like = (e) => {
         e.preventDefault();
-        this.props.fotoService.like(this.props.foto.id);
-        this.setState({ likeada: !this.state.likeada });
+        this.props.store.like(this.props.foto.id);
+        this.setState({likeada: !this.state.likeada});
     }
 
     comenta = (e) => {
         e.preventDefault();
-        this.props.fotoService.comenta(this.props.foto.id, this.state.comentario.value);
-        this.state.comentario.value = '';
+        this.props.store.comenta(this.props.foto.id, this.comentario.value);
+        this.comentario = '';
+    }
+
+    verificaLikeUsuario = (likers) => {
+        return this.props.store.verificaLikeUsuario(likers);
     }
 
     render() {
@@ -95,7 +97,7 @@ class Footer extends Component {
             <section className="fotoAtualizacoes">
                 <div onClick={this.like} className={this.state.likeada ? "fotoAtualizacoes-like-ativo" : "fotoAtualizacoes-like"}>Likar</div>
                 <form className="fotoAtualizacoes-form" onSubmit={this.comenta}>
-                    <input name="comentario" type="text" placeholder="Adicione um comentário..." ref={input => this.state.comentario = input } className="fotoAtualizacoes-form-campo" />
+                    <input name="comentario" type="text" placeholder="Adicione um comentário..." ref={input => this.comentario = input } className="fotoAtualizacoes-form-campo" />
                     <input type="submit" value="Comentar!" className="fotoAtualizacoes-form-submit" />
                 </form>
             </section> : null;
@@ -103,8 +105,7 @@ class Footer extends Component {
     }
 }
 
-class Foto extends Component {
-
+class Foto extends Component {  
 
     render() {
         return (
@@ -112,7 +113,7 @@ class Foto extends Component {
                 <Header {...this.props} ></Header>
                 <img alt="foto" className="foto-src" src={this.props.foto.urlFoto} />
                 <Info {...this.props}></Info>
-                <Footer {...this.props} ></Footer>
+                <Footer {...this.props}></Footer>
             </div>
         );
     }

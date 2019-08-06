@@ -11,7 +11,6 @@ class Login extends Component {
         this.state = { msg: '' }
         this.login = '';
         this.senha = '';
-        console.log(this.props);
     }
 
     logon = (e) => {
@@ -27,7 +26,7 @@ class Login extends Component {
     render() {
         const authToken = localStorage.getItem('@instaReact/auth-token');
         if (authToken != null) {
-            return (<Timeline></Timeline>)
+            return (<Timeline {...this.props}></Timeline>)
         } else {
             return (
                 <div>
