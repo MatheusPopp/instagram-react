@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Foto from './Foto';
 import { TimelineHeader } from './Header';
-import { withRouter } from 'react-router-dom';
 import { CSSTransitionGroup } from 'react-transition-group';
 import TimelineService from '../services/TimelineService';
 import {connect} from 'react-redux';

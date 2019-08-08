@@ -30,7 +30,6 @@ class TimelineHeaderBasic extends Component {
 
     constructor(props) {
         super(props);
-        console.log(this.props);
         this.filter = '';
     }
 
