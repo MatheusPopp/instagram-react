@@ -5,21 +5,24 @@ import Login from '../components/Login';
 import Logout from '../components/Logout';
 import Timeline from '../components/Timeline';
 import AuthenticationService from '../services/AuthenticationService';
+import store from '../store/index';
+import {Provider} from 'react-redux';
 
 class RouteConfig extends Component {
-
     render() {
         return (
             <Router>
-                <App>
-                    <Switch>
-                        <Route exact path="/" component={ (props) => <Login {...props} authenticationService = {AuthenticationService}></Login>}></Route>
-                        <PrivateRoute exact path="/timeline" component={(props) =><Timeline {...props} authenticationService={AuthenticationService}></Timeline>} ></PrivateRoute>
-                        <Route path="/timeline/:login" component={(props) =><Timeline {...props} authenticationService={AuthenticationService}></Timeline>}></Route>
-                        <Route path="/logout" component={Logout}></Route>
-                        <PrivateRoute component={(props) =><Timeline {...props} authenticationService={AuthenticationService}></Timeline>}></PrivateRoute>
-                    </Switch>
-                </App>
+                <Provider store={store}>
+                    <App>
+                        <Switch>
+                            <Route exact path="/" component={ (props) => <Login {...props}></Login>}></Route>
+                            <PrivateRoute exact path="/timeline" component={(props) =><Timeline {...props}></Timeline>} ></PrivateRoute>
+                            <Route path="/timeline/:login" component={(props) =><Timeline {...props}></Timeline>}></Route>
+                            <Route path="/logout" component={Logout}></Route>
+                            <PrivateRoute component={(props) =><Timeline {...props}></Timeline>}></PrivateRoute>
+                        </Switch>
+                    </App>
+                </Provider>
             </Router>
         );
     }
@@ -34,4 +37,4 @@ const PrivateRoute = ({component: Component, ...rest}) => (
     )}></Route>
 )
 
-export default RouteConfig;
+export default (RouteConfig);

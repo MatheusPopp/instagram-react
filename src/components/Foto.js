@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
-import TimelineService from '../services/TimelineService';
+import AuthenticationService from '../services/AuthenticationService';
 
 
 class Header extends Component {
@@ -79,19 +79,19 @@ class Footer extends Component {
 
     like = (e) => {
         e.preventDefault();
-        this.props.store.dispatch(TimelineService.like(this.props.foto.id));
+        this.props.like(this.props.foto.id);
     }
 
-    comenta = (e) => {
+    comment = (e) => {
         e.preventDefault();
-        this.props.store.dispatch(TimelineService.comment(this.props.foto.id, this.comentario.value));
+        this.props.comment(this.props.foto.id, this.comentario.value);
     }
 
     render() {
-        const component = this.props.authenticationService.isAuthenticated() ?
+        const component = AuthenticationService.isAuthenticated ?
             <section className="fotoAtualizacoes">
                 <div onClick={this.like} className={this.props.foto.likeada ? "fotoAtualizacoes-like-ativo" : "fotoAtualizacoes-like"}>Likar</div>
-                <form className="fotoAtualizacoes-form" onSubmit={this.comenta}>
+                <form className="fotoAtualizacoes-form" onSubmit={this.comment}>
                     <input name="comentario" type="text" placeholder="Adicione um comentário..." ref={input => this.comentario = input } className="fotoAtualizacoes-form-campo" />
                     <input type="submit" value="Comentar!" className="fotoAtualizacoes-form-submit" />
                 </form>

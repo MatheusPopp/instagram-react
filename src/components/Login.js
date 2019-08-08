@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Header from './Header';
 import Timeline from './Timeline';
+import AuthenticationService from '../services/AuthenticationService';
 
 
 class Login extends Component {
@@ -15,7 +16,7 @@ class Login extends Component {
 
     logon = (e) => {
         e.preventDefault();
-        this.props.authenticationService.logon(this.login.value, this.senha.value).then(token => {
+        AuthenticationService.logon(this.login.value, this.senha.value).then(token => {
             if (token) {
                 this.props.history.push('/timeline');
             }

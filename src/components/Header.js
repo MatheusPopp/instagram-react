@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import TimelineService from '../services/TimelineService';
+import AuthenticationService from '../services/AuthenticationService';
+import {connect} from 'react-redux';
+
 
 class Header extends Component {
-
     render() {
         return (
             <header className="header container">
@@ -21,40 +23,36 @@ class Header extends Component {
             </header>
         )
     }
-
 }
 
 
-export class TimelineHeader extends Component {
+class TimelineHeaderBasic extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {msg: ''}
-        this.props.store.subscribe(() => {
-            this.setState({msg: this.props.store.getState().header});
-        })
+        console.log(this.props);
         this.filter = '';
     }
 
     search = (e) => {
         e.preventDefault();
-        this.props.store.dispatch(TimelineService.search(this.filter.value));
+        this.props.search(this.filter.value);
     }
 
     logout = (e) => {
         e.preventDefault();
-        this.props.authenticationService.logout();
+        AuthenticationService.logout();
         this.props.history.push('/logout');
     }
 
     render() {
-        return (
+        return (   
             <Header>
                 <form className="header-busca" onSubmit={this.search}>
-                    <span className="error-message">{this.state.msg}</span>
+                    <span className="error-message">{this.props.msg}</span>
                     <input type="text" name="search" placeholder="Pesquisa" ref={(input)=> this.filter = input} className="header-busca-campo" />
                     <input type="submit" className="header-busca-submit" />
-                    {this.props.authenticationService.isAuthenticated() ? <button type="button" className="button-header" onClick={this.logout}>Sair</button> : ''}
+                    {AuthenticationService.isAuthenticated() ? <button type="button" className="button-header" onClick={this.logout}>Sair</button> : ''}
                 </form>
 
                 <nav>
@@ -68,5 +66,21 @@ export class TimelineHeader extends Component {
         );
     }
 }
+
+
+const mapStateToProps = (store) => {
+    return {msg: store.header}
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        search: (login) => {
+            dispatch(TimelineService.search(login));
+        }
+    }
+};
+
+export const TimelineHeader = connect(mapStateToProps, mapDispatchToProps) (TimelineHeaderBasic);
+
 
 export default withRouter(Header);

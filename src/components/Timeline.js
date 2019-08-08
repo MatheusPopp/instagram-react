@@ -4,37 +4,34 @@ import { TimelineHeader } from './Header';
 import { withRouter } from 'react-router-dom';
 import { CSSTransitionGroup } from 'react-transition-group';
 import TimelineService from '../services/TimelineService';
-import store from '../store/index';
+import {connect} from 'react-redux';
+
 
 
 
 class Timeline extends Component {
 
+
     render() {
         return (
 
             <div className="main">
-                <TimelineHeader {...this.props} store = {store}></TimelineHeader>
-                <TimelineContainer {...this.props} store = {store}></TimelineContainer>
+                <TimelineHeader {...this.props} ></TimelineHeader>
+                <TimelineContainer {...this.props} ></TimelineContainer>
             </div>
         );
     }
 }
 
 class TimelineContainer extends Component {
-    constructor(props) {
-        super(props);
-        this.state = { fotos: [] };
-        this.props.store.subscribe((fotos) => { this.setState({ fotos: this.props.store.getState().timeline }); });
-    }
 
     componentDidMount() {
-        this.props.store.dispatch(TimelineService.list(this.props.match.params['login']));
+        this.props.list(this.props.match.params['login']);
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.match.params.login !== this.props.match.params.login) {
-            this.props.store.dispatch(TimelineService.list(this.props.match.params['login']));
+            this.props.list(this.props.match.params['login']);
         }
     }
 
@@ -46,7 +43,7 @@ class TimelineContainer extends Component {
                     transitionEnterTimeout={500}
                     transitionLeaveTimeout={300}>
                     {
-                        this.state.fotos.map(foto => {
+                        this.props.fotos.map(foto => {
                             return <div key={foto.id}><Foto foto={foto} {...this.props} ></Foto></div>
                         })
                     }
@@ -57,6 +54,26 @@ class TimelineContainer extends Component {
 
     }
 }
+const mapStateToProps = (store) => {
+    return {fotos: store.timeline}
+};
 
-export default withRouter(Timeline);
+const mapDispatchToProps = (dispatch) => {
+    return {
+       list : (login) => {
+           dispatch(TimelineService.list(login));
+        }, 
+        like: (idFoto) => {
+            dispatch(TimelineService.like(idFoto));
+        },
+        comment: (idFoto, comment) => {
+            dispatch(TimelineService.comment(idFoto, comment));
+        }
+   }
+}
+
+const TimelineConnected = connect(mapStateToProps, mapDispatchToProps) (Timeline);
+
+
+export default TimelineConnected;
 
