@@ -8,7 +8,7 @@ export default class AuthenticationService {
         return this.token ? this._jwt_decode(this.token).sub : undefined;
     }
 
-    static isAuthenticated = () => {
+    static get isAuthenticated () {
         return this.token ? true : false;
     }
 

@@ -51,7 +51,7 @@ class TimelineHeaderBasic extends Component {
                     <span className="error-message">{this.props.msg}</span>
                     <input type="text" name="search" placeholder="Pesquisa" ref={(input)=> this.filter = input} className="header-busca-campo" />
                     <input type="submit" className="header-busca-submit" />
-                    {AuthenticationService.isAuthenticated() ? <button type="button" className="button-header" onClick={this.logout}>Sair</button> : ''}
+                    {AuthenticationService.isAuthenticated ? <button type="button" className="button-header" onClick={this.logout}>Sair</button> : ''}
                 </form>
 
                 <nav>

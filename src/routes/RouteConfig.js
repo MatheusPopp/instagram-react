@@ -30,7 +30,7 @@ class RouteConfig extends Component {
 
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} component = {(props) => (
-        (AuthenticationService.isAuthenticated() === true ?
+        (AuthenticationService.isAuthenticated === true ?
             <Component {...props}></Component> 
             :
             <Redirect to='/'></Redirect>)
