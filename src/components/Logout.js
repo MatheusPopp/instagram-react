@@ -1,17 +1,14 @@
 import { Component } from 'react';
-import AuthenticationService from '../store/AuthenticationService';
+import AuthenticationService from '../services/AuthenticationService';
 
 class Logout extends Component {
 
-
-    constructor(props) {
-        super(props);
-        this.authenticationService = new AuthenticationService();
+    componentDidMount() {
         this.logout();
     }
 
     logout = () => {
-        this.authenticationService.logout();
+        AuthenticationService.logout();
         this.props.history.push('/');
     }
 

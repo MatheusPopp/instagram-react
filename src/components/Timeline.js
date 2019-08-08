@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import Foto from './Foto';
 import { TimelineHeader } from './Header';
 import { withRouter } from 'react-router-dom';
-import Pubsub from 'pubsub-js'
 import { CSSTransitionGroup } from 'react-transition-group';
+import TimelineService from '../services/TimelineService';
+import store from '../store/index';
+
+
 
 class Timeline extends Component {
 
@@ -11,30 +14,27 @@ class Timeline extends Component {
         return (
 
             <div className="main">
-                <TimelineHeader {...this.props}></TimelineHeader>
-                <TimelineContainer {...this.props}></TimelineContainer>
+                <TimelineHeader {...this.props} store = {store}></TimelineHeader>
+                <TimelineContainer {...this.props} store = {store}></TimelineContainer>
             </div>
         );
     }
 }
 
 class TimelineContainer extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = { fotos: [] };
-        Pubsub.subscribe('updateTimeline', (topico, fotos) => {
-            this.setState({fotos: fotos});
-        });
-
+        this.props.store.subscribe((fotos) => { this.setState({ fotos: this.props.store.getState().timeline }); });
     }
 
     componentDidMount() {
-        this.props.store.obtemDados(this.props.match.params['login']);
+        this.props.store.dispatch(TimelineService.list(this.props.match.params['login']));
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.match.params.login !== this.props.match.params.login) {
-            this.props.store.obtemDados(this.props.match.params['login']);
+            this.props.store.dispatch(TimelineService.list(this.props.match.params['login']));
         }
     }
 

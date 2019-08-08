@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
+import TimelineService from '../services/TimelineService';
+
 
 class Header extends Component {
 
@@ -72,30 +74,23 @@ class Footer extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {likeada : this.verificaLikeUsuario(this.props.foto.likers)};
         this.comentario = ''
     }
 
     like = (e) => {
         e.preventDefault();
-        this.props.store.like(this.props.foto.id);
-        this.setState({likeada: !this.state.likeada});
+        this.props.store.dispatch(TimelineService.like(this.props.foto.id));
     }
 
     comenta = (e) => {
         e.preventDefault();
-        this.props.store.comenta(this.props.foto.id, this.comentario.value);
-        this.comentario = '';
-    }
-
-    verificaLikeUsuario = (likers) => {
-        return this.props.store.verificaLikeUsuario(likers);
+        this.props.store.dispatch(TimelineService.comment(this.props.foto.id, this.comentario.value));
     }
 
     render() {
         const component = this.props.authenticationService.isAuthenticated() ?
             <section className="fotoAtualizacoes">
-                <div onClick={this.like} className={this.state.likeada ? "fotoAtualizacoes-like-ativo" : "fotoAtualizacoes-like"}>Likar</div>
+                <div onClick={this.like} className={this.props.foto.likeada ? "fotoAtualizacoes-like-ativo" : "fotoAtualizacoes-like"}>Likar</div>
                 <form className="fotoAtualizacoes-form" onSubmit={this.comenta}>
                     <input name="comentario" type="text" placeholder="Adicione um comentário..." ref={input => this.comentario = input } className="fotoAtualizacoes-form-campo" />
                     <input type="submit" value="Comentar!" className="fotoAtualizacoes-form-submit" />

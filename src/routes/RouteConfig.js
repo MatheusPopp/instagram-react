@@ -4,12 +4,7 @@ import App from '../App';
 import Login from '../components/Login';
 import Logout from '../components/Logout';
 import Timeline from '../components/Timeline';
-import AuthenticationService from '../store/AuthenticationService';
-import TimelineStore from '../store/TimelineStore';
-
-
-const authenticationService = new AuthenticationService();
-const timelineStore = new TimelineStore([]);
+import AuthenticationService from '../services/AuthenticationService';
 
 class RouteConfig extends Component {
 
@@ -18,11 +13,11 @@ class RouteConfig extends Component {
             <Router>
                 <App>
                     <Switch>
-                        <Route exact path="/" component={ (props) => <Login {...props} store={timelineStore} authenticationService = {authenticationService}></Login>}></Route>
-                        <PrivateRoute exact path="/timeline" component={(props) =><Timeline {...props} store={timelineStore} authenticationService={authenticationService}></Timeline>} ></PrivateRoute>
-                        <Route path="/timeline/:login" component={(props) =><Timeline {...props} store={timelineStore} authenticationService={authenticationService}></Timeline>}></Route>
+                        <Route exact path="/" component={ (props) => <Login {...props} authenticationService = {AuthenticationService}></Login>}></Route>
+                        <PrivateRoute exact path="/timeline" component={(props) =><Timeline {...props} authenticationService={AuthenticationService}></Timeline>} ></PrivateRoute>
+                        <Route path="/timeline/:login" component={(props) =><Timeline {...props} authenticationService={AuthenticationService}></Timeline>}></Route>
                         <Route path="/logout" component={Logout}></Route>
-                        <PrivateRoute component={(props) =><Timeline {...props} store={timelineStore} authenticationService={authenticationService}></Timeline>}></PrivateRoute>
+                        <PrivateRoute component={(props) =><Timeline {...props} authenticationService={AuthenticationService}></Timeline>}></PrivateRoute>
                     </Switch>
                 </App>
             </Router>
@@ -32,7 +27,7 @@ class RouteConfig extends Component {
 
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} component = {(props) => (
-        (authenticationService.isAuthenticated() === true ?
+        (AuthenticationService.isAuthenticated() === true ?
             <Component {...props}></Component> 
             :
             <Redirect to='/'></Redirect>)

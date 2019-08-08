@@ -1,22 +1,22 @@
 export default class AuthenticationService {
 
-    get token () {
+    static get token () {
         return localStorage.getItem('@instaReact/auth-token');
     }
 
-    get userName() {
+    static get userName() {
         return this.token ? this._jwt_decode(this.token).sub : undefined;
     }
 
-    isAuthenticated = () => {
+    static isAuthenticated = () => {
         return this.token ? true : false;
     }
 
-    authenticate = (token) => {
+    static authenticate = (token) => {
         localStorage.setItem('@instaReact/auth-token', token);
     }
 
-    logon = (login, senha) => {
+    static logon = (login, senha) => {
         const requestInfo = {
             method: 'POST',
             body: JSON.stringify({login: login, senha: senha}),
@@ -40,11 +40,11 @@ export default class AuthenticationService {
         }));
     }
 
-    logout = () => {
+    static logout = () => {
         localStorage.removeItem('@instaReact/auth-token');
     }
 
-    _jwt_decode = (token) => {
+    static _jwt_decode = (token) => {
         var base64Url = token.split('.')[1];
         var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
         var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
